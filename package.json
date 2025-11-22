@@ -1,0 +1,19 @@
+{
+  "name": "task-cli",
+  "module": "index.ts",
+  "type": "module",
+  "devDependencies": {
+    "@types/bun": "latest",
+    "@types/cli-table": "^0.3.4"
+  },
+  "peerDependencies": {
+    "typescript": "^5.0.0"
+  },
+  "dependencies": {
+    "cli-table": "^0.3.11",
+    "commander": "^14.0.1"
+  },
+  "scripts": {
+    "build": "bun build --compile --outfile=task-cli index.ts"
+  }
+}
