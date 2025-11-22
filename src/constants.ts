@@ -6,7 +6,7 @@ enum Status {
 
 enum Messages {
   NO_TASKS_AVAILABLE = "No tasks available.",
-  TASK_NOT_FOUND = "Task not found.",
+  TASK_NOT_FOUND = "Task not found",
 }
 
 export {

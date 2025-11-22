@@ -89,7 +89,7 @@ describe("task-cli program", () => {
       await program.parseAsync(["node", "task-cli", "add", "Test task"]);
       expect(existsSync(FILE_PATH)).toBe(true);
       await program.parseAsync(["node", "task-cli", "delete", "150"]);
-      expect(consoleSpy).toHaveBeenCalledWith(`Task with ID 150 cannot be found.`);
+      expect(consoleSpy).toHaveBeenCalledWith(`${Messages.TASK_NOT_FOUND} with ID 150.`);
     });
   });
 
@@ -121,7 +121,7 @@ describe("task-cli program", () => {
           const data = await Bun.file(FILE_PATH).json();
           expect(data["tasks"].length).toBe(1);
           await program.parseAsync(["node", "task-cli", "mark", status, "300"]);
-          expect(consoleSpy).toHaveBeenCalledWith(Messages.TASK_NOT_FOUND);
+          expect(consoleSpy).toHaveBeenCalledWith(`${Messages.TASK_NOT_FOUND} with ID 300.`);
         });
 
         test(`marks task as ${status}`, async () => {
@@ -197,7 +197,7 @@ describe("task-cli program", () => {
       const program = createProgram();
       await program.parseAsync(["node", "task-cli", "add", "task update"]);
       await program.parseAsync(["node", "task-cli", "update", "2", "task update"]);
-      expect(consoleSpy).toHaveBeenCalledWith("Task 2 doesn't exist.");
+      expect(consoleSpy).toHaveBeenCalledWith(`${Messages.TASK_NOT_FOUND} with ID 2.`);
     });
 
     test("updates task", async () => {

@@ -3,12 +3,15 @@ import { existsSync, unlinkSync } from "fs";
 
 import {
   dataFileExists,
-  createBackup,
   hasTasks,
 } from "../hooks";
 import {
   restoreBackup,
+  createBackup,
+  cleanupBackup,
+  findTask,
 } from "../commons";
+import { Messages } from "../constants";
 
 export default function deleteCommand(filePath: string, rootFolder: string) {
   const command = new Command("delete");
@@ -16,7 +19,6 @@ export default function deleteCommand(filePath: string, rootFolder: string) {
   command
     .description("Deletes the task with the given ID.")
     .hook("preAction", dataFileExists(filePath))
-    .hook("preAction", createBackup(rootFolder, filePath))
     .hook("preAction", hasTasks(filePath))
     .argument("<number>", "ID of the task to delete")
     .action(async function (this: any, idArg: string) {
@@ -27,11 +29,13 @@ export default function deleteCommand(filePath: string, rootFolder: string) {
       }
 
       const data: Data = await Bun.file(filePath).json();
-
-      if (data["tasks"].find(task => task.id === id) === undefined) {
-        console.log(`Task with ID ${id} cannot be found.`);
+      const task: Task | undefined = findTask(data.tasks, id)
+      if (task === undefined) {
+        console.log(`${Messages.TASK_NOT_FOUND} with ID ${id}.`);
         return;
       }
+      const backupFilePath = createBackup(rootFolder, filePath);
+
 
       try {
         const tasks = data.tasks.filter(task => task.id !== id);
@@ -42,9 +46,10 @@ export default function deleteCommand(filePath: string, rootFolder: string) {
         await Bun.write(filePath, JSON.stringify(updatedData, null, 2));
         console.log(`Task ${id} successfully deleted.`);
       } catch (err) {
-        restoreBackup(this.backupPath, filePath)
+        restoreBackup(backupFilePath, filePath);
+        throw err;
       } finally {
-        unlinkSync(this.backupPath);
+        cleanupBackup(backupFilePath);
       }
     });
 

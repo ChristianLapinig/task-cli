@@ -6,6 +6,7 @@ import {
   createBackup,
   restoreBackup
 } from "../commons";
+import cleanupBackup from "../commons/cleanupBackup";
 
 const defaultData: Data = {
   id_count: 1,
@@ -25,7 +26,7 @@ export default function addCommand(filePath: string, rootFolder: string) {
       }
 
       const data: Data = await Bun.file(filePath).json();
-      const backupFilePath = await createBackup(rootFolder, filePath);
+      const backupFilePath = createBackup(rootFolder, filePath);
 
       try {
         const task: Task = {
@@ -41,10 +42,10 @@ export default function addCommand(filePath: string, rootFolder: string) {
         await Bun.write(filePath, JSON.stringify(data, null, 2));
         console.log("Task successfully created.");
       } catch (err) {
-        restoreBackup(backupFilePath, filePath);
+        restoreBackup(backupFilePath, filePath)
         throw err;
       } finally {
-        unlinkSync(backupFilePath);
+        cleanupBackup(backupFilePath);
       }
     });
 
