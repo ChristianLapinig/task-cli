@@ -7,5 +7,10 @@ import fs from "fs";
  * @param dest path to restore to
  */
 export default function restoreBackup(src: string, dest: string) {
-  fs.copyFileSync(src, dest);
+  try { 
+    fs.copyFileSync(src, dest);
+  } catch (err) {
+    console.error("Failed to restore backup:", err);
+    throw new Error(`Failed to restore backup from ${src} to ${dest}: ${err}`);
+  }
 }

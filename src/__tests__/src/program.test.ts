@@ -55,8 +55,10 @@ describe("task-cli program", () => {
     test("exits when an invalid argument is passed", async () => {
       const program = createProgram();
       await program.parseAsync(["node", "task-cli", "add", "Test task"]);
-      await program.parseAsync(["node", "task-cli", "delete", "abc"]);
-      expect(consoleSpy).toHaveBeenCalledWith("Invalid argument. A valid ID must be passed.");
+      expect(async () => {
+        await program.parseAsync(["node", "task-cli", "delete", "abc"]);
+      }).toThrow("process.exit(1)");
+      expect(consoleSpy).toHaveBeenCalledWith(Messages.INVALID_ID);
     });
 
     test("throws error if data.json doesn't exist", async () => {
@@ -65,12 +67,11 @@ describe("task-cli program", () => {
       expect(async () => {
         await program.parseAsync(["node", "task-cli", "delete", "1"]);
       }).toThrow("process.exit(1)");
-      expect(consoleSpy).toHaveBeenCalledWith("Data file not found.");
+      expect(consoleSpy).toHaveBeenCalledWith(Messages.DATA_FILE_NOT_FOUND);
       expect(exitSpy).toHaveBeenCalledWith(1);
     });
 
     test("deletes given task", async () => {
-      console.log("hello? are you exiting here?");
       const program = createProgram();
       await program.parseAsync(["node", "task-cli", "add", "Test task"]);
       expect(existsSync(FILE_PATH)).toBe(true);
@@ -78,7 +79,7 @@ describe("task-cli program", () => {
       let data;
       data = await Bun.file(FILE_PATH).json();
       expect(data["tasks"].length).toBe(1);
-      const task = data["tasks"].map((t: Task) => t.id)[0];
+      const task = data["tasks"][0];
       await program.parseAsync(["node", "task-cli", "delete", `${task.id}`]);
       data = await Bun.file(FILE_PATH).json();
       expect(data["tasks"].find((t: Task) => t.id === task.id)).toBe(undefined);
@@ -89,7 +90,7 @@ describe("task-cli program", () => {
       await program.parseAsync(["node", "task-cli", "add", "Test task"]);
       expect(existsSync(FILE_PATH)).toBe(true);
       await program.parseAsync(["node", "task-cli", "delete", "150"]);
-      expect(consoleSpy).toHaveBeenCalledWith(`Task with ID 150 cannot be found.`);
+      expect(consoleSpy).toHaveBeenCalledWith(`${Messages.TASK_NOT_FOUND} with ID 150.`);
     });
   });
 
@@ -100,8 +101,10 @@ describe("task-cli program", () => {
         test("exits if an invalid id is passed - " + status, async () => {
           const program = createProgram();
           await program.parseAsync(["node", "task-cli", "add", "test task"]);
-          await program.parseAsync(["node", "task-cli", "mark", status, "abcd"]);
-          expect(consoleSpy).toHaveBeenCalledWith("Invalid argument. A valid ID must be passed.");
+          expect(async () => {
+            await program.parseAsync(["node", "task-cli", "mark", status, "abcd"]);
+          }).toThrow("process.exit(1)");
+          expect(consoleSpy).toHaveBeenCalledWith(Messages.INVALID_ID);
         });
 
         test("throws error if data.json doesn't exist - " + status, async () => {
@@ -109,7 +112,7 @@ describe("task-cli program", () => {
           expect(async () => {
             await program.parseAsync(["node", "task-cli", "mark", status, "1"])
           }).toThrow("process.exit(1)");
-          expect(consoleSpy).toHaveBeenCalledWith("Data file not found.");
+          expect(consoleSpy).toHaveBeenCalledWith(Messages.DATA_FILE_NOT_FOUND);
           expect(exitSpy).toHaveBeenCalledWith(1);
         });
 
@@ -121,7 +124,7 @@ describe("task-cli program", () => {
           const data = await Bun.file(FILE_PATH).json();
           expect(data["tasks"].length).toBe(1);
           await program.parseAsync(["node", "task-cli", "mark", status, "300"]);
-          expect(consoleSpy).toHaveBeenCalledWith(Messages.TASK_NOT_FOUND);
+          expect(consoleSpy).toHaveBeenCalledWith(`${Messages.TASK_NOT_FOUND} with ID 300.`);
         });
 
         test(`marks task as ${status}`, async () => {
@@ -162,8 +165,10 @@ describe("task-cli program", () => {
     test("exits if an invalid id argument is passed", async () => {
       const program = createProgram();
       await program.parseAsync(["node", "task-cli", "add", "test task"]);
-      await program.parseAsync(["node", "task-cli", "update", "abc", "test update"]);
-      expect(consoleSpy).toHaveBeenCalledWith("Invalid argument. A valid ID must be passed.");
+      expect(async () => {
+        await program.parseAsync(["node", "task-cli", "update", "abc", "test update"]);
+      }).toThrow("process.exit(1)")
+      expect(consoleSpy).toHaveBeenCalledWith(Messages.INVALID_ID);
     });
 
     test("exits if the description argument is invalid/empty", async () => {
@@ -197,7 +202,7 @@ describe("task-cli program", () => {
       const program = createProgram();
       await program.parseAsync(["node", "task-cli", "add", "task update"]);
       await program.parseAsync(["node", "task-cli", "update", "2", "task update"]);
-      expect(consoleSpy).toHaveBeenCalledWith("Task 2 doesn't exist.");
+      expect(consoleSpy).toHaveBeenCalledWith(`${Messages.TASK_NOT_FOUND} with ID 2.`);
     });
 
     test("updates task", async () => {

@@ -9,7 +9,7 @@ import fs from "fs";
  * @param data data to backup
  * @returns path to the backup file
  */
-export default async function createBackup(folderPath: string, filePath: string): Promise<string> {
+export default function createBackup(folderPath: string, filePath: string) {
   const timestamp = new Date().toISOString().replace(/[:.]/g, "-");
   const backupFolder = `${folderPath}/backups`;
 

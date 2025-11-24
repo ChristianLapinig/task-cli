@@ -2,9 +2,9 @@ name: Task CLI CI
 
 on:
   push:
-    branches: [task-cli/main]
+    branches: [main]
   pull_request:
-    branches: [task-cli/main]
+    branches: [main]
 
 jobs:
   build:
