@@ -6,6 +6,7 @@ import {
 } from "../hooks"
 import { Status, Messages } from "../constants";
 
+// cli-table requires a specific type for rows
 function displayTasks(tasks: (string | number)[][]) {
   const table = new Table({
     head: ["ID", "Task", "Status"],
