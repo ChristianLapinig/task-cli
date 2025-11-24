@@ -6,6 +6,17 @@
     "@types/bun": "latest",
     "@types/cli-table": "^0.3.4"
   },
+  "description": "A CLI tool for managing tasks",
+  "keywords": ["cli", "task", "manager", "commander"],
+  "author": "Christian Lapinig",
+  "license": "MIT",
+  "engines": {
+    "bun": ">=1.0.0"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/ChristianLapinig/task-cli.git"
+  },
   "peerDependencies": {
     "typescript": "^5.0.0"
   },
@@ -14,6 +25,10 @@
     "commander": "^14.0.1"
   },
   "scripts": {
-    "build": "bun build --compile --outfile=task-cli index.ts"
+    "build": "bun build --compile --outfile=task-cli index.ts",
+    "test": "bun test"
+  },
+  "bin": {
+    "task": "./task-cli"
   }
 }

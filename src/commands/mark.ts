@@ -5,7 +5,7 @@ import {
   dataFileExists,
   hasTasks,
 } from "../hooks";
-import { findTask, restoreBackup, createBackup, cleanupBackup } from "../commons";
+import { findTask, restoreBackup, createBackup, cleanupBackup, validateId } from "../commons";
 import { Messages, Status } from "../constants";
 
 export default function markCommand(filePath: string, rootFolder: string) {
@@ -22,11 +22,7 @@ export default function markCommand(filePath: string, rootFolder: string) {
       .argument("<task-id>", "ID of the task to update.")
       .action(async function (idArg: string) {
         const id = parseInt(idArg);
-
-        if (isNaN(id)) {
-          console.log("Invalid argument. A valid ID must be passed.");
-          return;
-        }
+        validateId(id);
 
         const data: Data = await Bun.file(filePath).json();
         const task: Task | undefined = findTask(data.tasks, id)

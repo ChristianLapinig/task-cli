@@ -6,10 +6,10 @@ import {
 } from "../hooks"
 import { Status, Messages } from "../constants";
 
-function displayTasks(tasks: any[], headers: string[]) {
+function displayTasks(tasks: (string | number)[][]) {
   const table = new Table({
-    head: headers,
-    rows: tasks,
+    head: ["ID", "Task", "Status"],
+    rows: tasks as any,
   });
 
   console.log(table.toString());
@@ -32,7 +32,7 @@ export default function listCommand(filePath: string) {
         return;
       }
 
-      displayTasks(tasks, ["ID", "Task", "Status"]);
+      displayTasks(tasks);
     });
 
   for (const status of Object.values(Status)) {
@@ -44,14 +44,14 @@ export default function listCommand(filePath: string) {
         const data: Data = await Bun.file(filePath).json();
         const tasks = data.tasks
           .filter(task => task.status === status)
-          .map(task => ([task.description]));
+          .map(task => ([task.id, task.description, task.status]));
 
         if (tasks.length === 0) {
           console.log(Messages.NO_TASKS_AVAILABLE);
           return;
         }
 
-        displayTasks(tasks, [`Task (${status})`]);
+        displayTasks(tasks);
       });
   }
 

@@ -8,6 +8,7 @@ import {
   restoreBackup,
   createBackup,
   findTask,
+  validateId,
 } from "../commons"
 import cleanupBackup from "../commons/cleanupBackup";
 import { Messages } from "../constants";
@@ -23,10 +24,7 @@ export default function updateCommand(filepath: string, rootFolder: string) {
     .argument("<string>", "Task description. I.e., 'bring car to the mechanic.'")
     .action(async function (idArg: string, description: string) {
       const id = parseInt(idArg);
-      if (isNaN(id)) {
-        console.log("Invalid argument. A valid ID must be passed.");
-        return;
-      }
+      validateId(id);
 
       if (description === undefined || description.length === 0) {
         console.log("No task input was passed.");

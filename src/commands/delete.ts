@@ -10,6 +10,7 @@ import {
   createBackup,
   cleanupBackup,
   findTask,
+  validateId,
 } from "../commons";
 import { Messages } from "../constants";
 
@@ -21,12 +22,9 @@ export default function deleteCommand(filePath: string, rootFolder: string) {
     .hook("preAction", dataFileExists(filePath))
     .hook("preAction", hasTasks(filePath))
     .argument("<number>", "ID of the task to delete")
-    .action(async function (this: any, idArg: string) {
+    .action(async function (idArg: string) {
       const id = Number.parseInt(idArg);
-      if (isNaN(id)) {
-        console.log("Invalid argument. A valid ID must be passed.");
-        return;
-      }
+      validateId(id);
 
       const data: Data = await Bun.file(filePath).json();
       const task: Task | undefined = findTask(data.tasks, id)
